@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Nenkin Simulator 2025</title>
+<style>
+html,body{margin:0;padding:0}
+*{box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif;
+  background:#f0efea;color:#1a1a18;min-height:100vh;padding:12px;font-size:14px;
+  -webkit-text-size-adjust:100%
+}
+@media(prefers-color-scheme:dark){
+  body{background:#2a2a28;color:#f0efea}
+  .card{background:#1e1e1c!important;border-color:rgba(255,255,255,0.12)!important}
+  input,select{background:#2a2a28!important;color:#f0efea!important;border-color:rgba(255,255,255,0.22)!important}
+  .stitle,.notice,.met,.spbox{background:#2a2a28!important}
+  .blist{border-color:rgba(255,255,255,0.12)!important}
+  .br{border-color:rgba(255,255,255,0.08)!important}
+  .br.hd,.br.tot{background:#2a2a28!important}
+  .ibox{background:#042c53!important;color:#85b7eb!important}
+  .bs{background:#04342c!important;color:#5dcaa5!important}
+  .bi{background:#042c53!important;color:#85b7eb!important}
+  .bw{background:#412402!important;color:#ef9f27!important}
+}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:18px;font-weight:500;margin:0 0 3px 0}
+.sub{font-size:12px;color:#6b6b67;margin:0 0 14px 0}
+.card{background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,0.12);padding:16px;margin-bottom:12px}
+.tabs{display:-webkit-flex;display:flex;gap:2px;border-bottom:1px solid rgba(0,0,0,0.12);margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:7px 13px;font-size:13px;cursor:pointer;border:none;background:none;color:#6b6b67;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;font-family:inherit;-webkit-appearance:none}
+.tab.on{color:#1a1a18;border-bottom-color:#1a1a18;font-weight:500}
+@media(prefers-color-scheme:dark){.tab{color:#a8a8a4}.tab.on{color:#f0efea;border-bottom-color:#f0efea}}
+.tc{display:none}.tc.on{display:block}
+.sec{margin-bottom:14px}
+.stitle{font-size:11px;font-weight:500;color:#6b6b67;padding:3px 8px;background:#f5f5f3;border-radius:8px;margin-bottom:8px}
+.g2{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:9px;margin-bottom:9px}
+.g2>.f{-webkit-flex:1 1 160px;flex:1 1 160px;min-width:0}
+.f{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:3px}
+.f label{font-size:11px;color:#6b6b67}
+.f input,.f select{
+  font-size:13px;padding:7px 9px;border-radius:8px;
+  border:1px solid rgba(0,0,0,0.2);
+  background:#fff;color:#1a1a18;width:100%;
+  font-family:inherit;-webkit-appearance:none;appearance:none;-webkit-border-radius:8px
+}
+.f select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;background-color:#fff
+}
+.notice{font-size:12px;color:#6b6b67;padding:8px 11px;background:#f5f5f3;border-radius:8px;margin-bottom:9px;line-height:1.65}
+.ibox{font-size:12px;color:#0c447c;padding:8px 11px;background:#e6f1fb;border-radius:8px;margin-bottom:9px;line-height:1.65}
+.badge{font-size:10px;padding:1px 6px;border-radius:9px;margin-left:4px;display:inline-block}
+.bs{background:#e1f5ee;color:#085041}
+.bi{background:#e6f1fb;color:#0c447c}
+.bw{background:#faeeda;color:#633806}
+.cbtn{
+  width:100%;padding:11px;font-size:14px;font-weight:500;cursor:pointer;
+  border-radius:8px;border:none;background:#1a1a18;color:#fff;
+  margin-bottom:14px;font-family:inherit;-webkit-appearance:none;-webkit-border-radius:8px
+}
+@media(prefers-color-scheme:dark){.cbtn{background:#f0efea;color:#1a1a18}}
+.cbtn:active{opacity:.7}
+.mg{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:9px;margin-bottom:14px}
+.met{background:#f5f5f3;border-radius:8px;padding:11px;-webkit-flex:1 1 120px;flex:1 1 120px}
+.ml{font-size:11px;color:#6b6b67;margin-bottom:2px}
+.mv{font-size:19px;font-weight:500}
+.ms{font-size:11px;color:#6b6b67;margin-top:2px}
+.blist{border:1px solid rgba(0,0,0,0.12);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.br{display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;-webkit-align-items:center;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(0,0,0,0.08);font-size:13px}
+.br:last-child{border-bottom:none}
+.br.hd{background:#f5f5f3;font-size:11px;font-weight:500;color:#6b6b67}
+.br.tot{font-weight:500;background:#f5f5f3}
+.br.neg{color:#791f1f}
+@media(prefers-color-scheme:dark){.br.neg{color:#f09595}}
+.cw{margin-bottom:14px;width:100%}
+canvas{display:block}
+.spbox{border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:11px;margin-bottom:9px;background:#f5f5f3}
+.sptitle{font-size:12px;font-weight:500;margin-bottom:9px}
+.hid{display:none!important}
+.leg{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:11px;color:#6b6b67}
+@media(prefers-color-scheme:dark){.leg{color:#a8a8a4}}
+.leg span{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:4px}
+.ldot{width:10px;height:10px;border-radius:2px;display:inline-block;-webkit-flex-shrink:0;flex-shrink:0}
+footer{text-align:center;font-size:11px;color:#aaa;padding:20px 0 10px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div style="padding:12px 0 10px">
+  <h1>年金受給シミュレーター</h1>
+  <p class="sub">老齢・障害・遺族年金、企業年金、iDeCo 全制度対応（2025年度版）完全オフライン動作</p>
+</div>
+
+<div class="card">
+<div class="tabs">
+  <button class="tab on" onclick="st('inp')">本人情報</button>
+  <button class="tab" onclick="st('sp')">配偶者・家族</button>
+  <button class="tab" onclick="st('adv')">詳細設定</button>
+  <button class="tab" onclick="st('res')">試算結果</button>
+  <button class="tab" onclick="st('life')">生涯収支</button>
+</div>
+
+<!-- 本人情報 -->
+<div id="tab-inp" class="tc on">
+<div class="sec">
+  <div class="stitle">基本属性</div>
+  <div class="g2">
+    <div class="f"><label>生年（西暦）</label><input type="number" id="birthYear" value="1970" min="1940" max="2005"></div>
+    <div class="f"><label>性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">就業・雇用形態</div>
+  <div class="g2">
+    <div class="f"><label>現在の就業状況</label>
+      <select id="empStatus" onchange="updEmp()">
+        <option value="company_full">会社員（正社員・フルタイム）</option>
+        <option value="company_part">会社員（パートタイム）</option>
+        <option value="public_full">公務員・共済組合員</option>
+        <option value="self_full">自営業・個人事業主</option>
+        <option value="self_freela">フリーランス</option>
+        <option value="part_hoken">パート・アルバイト（社会保険加入）</option>
+        <option value="part_nashi">パート・アルバイト（社会保険未加入）</option>
+        <option value="fuyou_106">扶養内パート（年収106万円未満）</option>
+        <option value="fuyou_130">扶養内パート（年収106〜130万円未満）</option>
+        <option value="fuyou_150">扶養内パート（年収130〜150万円未満）</option>
+        <option value="fuyou_over">扶養外・収入あり（年収150万円以上）</option>
+        <option value="housewife">専業主婦・主夫（第3号被保険者）</option>
+        <option value="student">学生（国民年金猶予・免除中）</option>
+        <option value="unemployed">無職・求職中</option>
+        <option value="disab_work">障害・傷病により無職</option>
+        <option value="mixed">会社員→自営業（キャリアチェンジ）</option>
+        <option value="abroad">海外居住・長期滞在</option>
+      </select>
+    </div>
+    <div class="f"><label>就業開始年齢</label><input type="number" id="workStartAge" value="22" min="15" max="65"></div>
+  </div>
+  <div class="g2">
+    <div class="f"><label>退職・転換予定年齢</label><input type="number" id="retireAge" value="65" min="40" max="75"></div>
+    <div class="f" id="fEmpY"><label>厚生年金加入期間（年）</label><input type="number" id="empYears" value="40" min="0" max="45"></div>
+  </div>
+  <div class="g2">
+    <div class="f" id="fMon"><label>標準報酬月額（万円）</label><input type="number" id="avgMonthly" value="36" min="8.8" max="65" step="0.5"></div>
+    <div class="f"><label>現在の年収（万円）</label><input type="number" id="annualIncome" value="600" min="0" max="3000" step="10"></div>
+  </div>
+  <div class="g2 hid" id="gPart">
+    <div class="f"><label>週の所定労働時間（時間）</label><input type="number" id="weekHours" value="25" min="1" max="40"></div>
+    <div class="f"><label>月額賃金（万円）</label><input type="number" id="monthlyWage" value="12" min="0" max="100" step="0.5"></div>
+  </div>
+  <div id="empInfo" class="notice" style="display:none"></div>
+</div>
+<div class="sec">
+  <div class="stitle">国民年金・納付状況</div>
+  <div class="g2">
+    <div class="f"><label>国民年金納付状況</label>
+      <select id="nenkinSt">
+        <option value="full">全期間納付（満額）</option>
+        <option value="partial">一部未納あり</option>
+        <option value="menjo_full">全額免除期間あり</option>
+        <option value="menjo_half">半額免除期間あり</option>
+        <option value="yuuyo">猶予・学生納付特例あり</option>
+        <option value="foreign">外国籍・任意加入</option>
+      </select>
+    </div>
+    <div class="f"><label>実際の納付月数（月）</label><input type="number" id="paidMon" value="480" min="0" max="480"></div>
+  </div>
+  <div class="g2">
+    <div class="f"><label>免除月数（月）</label><input type="number" id="menjoMon" value="0" min="0" max="480"></div>
+    <div class="f"><label>未納月数（月）</label><input type="number" id="minoMon" value="0" min="0" max="480"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">受給開始・想定寿命</div>
+  <div class="g2">
+    <div class="f"><label>受給開始年齢</label>
+      <select id="startAge">
+        <option value="60">60歳（繰上 -30%）</option>
+        <option value="61">61歳（繰上 -24%）</option>
+        <option value="62">62歳（繰上 -18%）</option>
+        <option value="63">63歳（繰上 -12%）</option>
+        <option value="64">64歳（繰上 -6%）</option>
+        <option value="65" selected>65歳（基準）</option>
+        <option value="66">66歳（繰下 +8.4%）</option>
+        <option value="67">67歳（繰下 +16.8%）</option>
+        <option value="68">68歳（繰下 +25.2%）</option>
+        <option value="69">69歳（繰下 +33.6%）</option>
+        <option value="70">70歳（繰下 +42%）</option>
+        <option value="71">71歳（繰下 +50.4%）</option>
+        <option value="72">72歳（繰下 +58.8%）</option>
+        <option value="73">73歳（繰下 +67.2%）</option>
+        <option value="74">74歳（繰下 +75.6%）</option>
+        <option value="75">75歳（繰下 +84%）</option>
+      </select>
+    </div>
+    <div class="f"><label>想定死亡年齢</label><input type="number" id="deathAge" value="85" min="65" max="110"></div>
+  </div>
+</div>
+<button class="cbtn" onclick="calc();st('res')">試算する</button>
+</div>
+
+<!-- 配偶者・家族 -->
+<div id="tab-sp" class="tc">
+<div class="sec">
+  <div class="stitle">配偶者の有無・状況</div>
+  <div class="f" style="margin-bottom:9px">
+    <label>配偶者の状況</label>
+    <select id="spSt" onchange="updSp()">
+      <option value="none">配偶者なし</option>
+      <option value="hw3">専業主婦・主夫（第3号被保険者）</option>
+      <option value="pf106">扶養内パート（年収106万円未満）</option>
+      <option value="pf130">扶養内パート（年収106〜130万円未満）</option>
+      <option value="pf150">扶養内パート（年収130〜150万円未満）</option>
+      <option value="phoken">パート・社会保険加入（年収130万円以上）</option>
+      <option value="cfull">会社員（正社員・フルタイム）</option>
+      <option value="pgov">公務員・共済組合員</option>
+      <option value="self">自営業・国民年金第1号</option>
+      <option value="sdisab">障害者（障害年金受給中）</option>
+      <option value="dead">死別（遺族年金対象）</option>
+    </select>
+  </div>
+  <div id="spDetail" class="spbox hid">
+    <div class="sptitle">配偶者の詳細情報</div>
+    <div class="g2">
+      <div class="f"><label>配偶者の生年（西暦）</label><input type="number" id="spBirth" value="1972" min="1940" max="2005"></div>
+      <div class="f"><label>配偶者の厚生年金加入年数</label><input type="number" id="spEmpY" value="0" min="0" max="45"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>配偶者の平均標準報酬月額（万円）</label><input type="number" id="spMon" value="20" min="0" max="65"></div>
+      <div class="f"><label>配偶者の年収（万円）</label><input type="number" id="spInc" value="100" min="0" max="2000"></div>
+    </div>
+    <div id="spInfoBox" class="ibox" style="display:none"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">子ども・扶養家族</div>
+  <div class="g2">
+    <div class="f"><label>18歳未満の子どもの人数</label>
+      <select id="childCnt"><option value="0">0人</option><option value="1">1人</option><option value="2">2人</option><option value="3">3人以上</option></select>
+    </div>
+    <div class="f"><label>障害のある扶養家族</label>
+      <select id="disabDep"><option value="none">なし</option><option value="yes">あり（障害等級1〜2級）</option></select>
+    </div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">遺族年金・障害年金</div>
+  <div class="g2">
+    <div class="f"><label>遺族年金受給</label>
+      <select id="survivors">
+        <option value="none">なし</option>
+        <option value="basic">遺族基礎年金のみ</option>
+        <option value="kosei">遺族厚生年金あり</option>
+        <option value="both">遺族基礎＋厚生年金</option>
+      </select>
+    </div>
+    <div class="f"><label>障害年金受給</label>
+      <select id="disabPen">
+        <option value="none">なし</option>
+        <option value="g1">障害基礎年金1級</option>
+        <option value="g2">障害基礎年金2級</option>
+        <option value="k1">障害厚生年金1級</option>
+        <option value="k2">障害厚生年金2級</option>
+        <option value="k3">障害厚生年金3級</option>
+      </select>
+    </div>
+  </div>
+  <div class="notice">遺族・障害年金は老齢年金と原則併給不可（65歳以降は一部例外あり）。</div>
+</div>
+<button class="cbtn" onclick="calc();st('res')">試算する</button>
+</div>
+
+<!-- 詳細設定 -->
+<div id="tab-adv" class="tc">
+<div class="sec">
+  <div class="stitle">付加年金・国民年金基金（自営業・第1号専用）</div>
+  <div class="g2">
+    <div class="f"><label>付加年金</label><select id="fuka"><option value="no">なし</option><option value="yes">あり（月400円）</option></select></div>
+    <div class="f"><label>付加保険料納付月数</label><input type="number" id="fukaMon" value="0" min="0" max="480"></div>
+  </div>
+  <div class="g2">
+    <div class="f"><label>国民年金基金</label><select id="npf"><option value="no">なし</option><option value="yes">あり</option></select></div>
+    <div class="f"><label>国民年金基金 月額（円）</label><input type="number" id="npfAmt" value="0" min="0" max="68000"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">iDeCo（個人型確定拠出年金）</div>
+  <div class="g2">
+    <div class="f"><label>加入区分</label>
+      <select id="ideco">
+        <option value="no">加入なし</option>
+        <option value="company">会社員（月2.3万円上限）</option>
+        <option value="cdc">企業型DC併用（月2万円上限）</option>
+        <option value="gov">公務員（月1.2万円上限）</option>
+        <option value="self">自営業（月6.8万円上限）</option>
+        <option value="hw">専業主婦・主夫（月2.3万円上限）</option>
+      </select>
+    </div>
+    <div class="f"><label>月額掛金（円）</label><input type="number" id="idecoAmt" value="23000" min="5000" max="68000" step="1000"></div>
+  </div>
+  <div class="g2">
+    <div class="f"><label>加入期間（年）</label><input type="number" id="idecoY" value="20" min="1" max="40"></div>
+    <div class="f"><label>想定運用利回り（%）</label><input type="number" id="idecoR" value="3" min="0" max="10" step="0.5"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">企業年金・退職給付</div>
+  <div class="g2">
+    <div class="f"><label>確定給付企業年金（DB）</label><select id="dbPen"><option value="no">なし</option><option value="yes">あり</option></select></div>
+    <div class="f"><label>DB 年額（万円）</label><input type="number" id="dbAmt" value="60" min="0" max="500"></div>
+  </div>
+  <div class="g2">
+    <div class="f"><label>企業型DC</label><select id="dcPen"><option value="no">なし</option><option value="yes">あり</option></select></div>
+    <div class="f"><label>企業型DC 積立総額（万円）</label><input type="number" id="dcAmt" value="1000" min="0" max="5000"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stitle">在職老齢年金（65歳以降就労）</div>
+  <div class="g2">
+    <div class="f"><label>65歳以降の就労</label><select id="w65"><option value="no">なし</option><option value="yes">あり</option></select></div>
+    <div class="f"><label>65歳以降の月収（万円）</label><input type="number" id="sal65" value="20" min="0" max="100"></div>
+  </div>
+  <div class="notice">2025年度：基準額 月50万円。月収＋年金月額が50万円超の場合、超過分の半額を停止。</div>
+</div>
+<button class="cbtn" onclick="calc();st('res')">試算する</button>
+</div>
+
+<!-- 試算結果 -->
+<div id="tab-res" class="tc">
+  <div id="resContent"><div class="notice">「本人情報」タブを入力して「試算する」を押してください。</div></div>
+</div>
+
+<!-- 生涯収支 -->
+<div id="tab-life" class="tc">
+  <div id="lifeContent"><div class="notice">試算を実行すると生涯収支グラフが表示されます。</div></div>
+</div>
+</div>
+
+<footer>本シミュレーターは概算試算ツールです。実際の受給額は日本年金機構にお問い合わせください。<br>2025年度制度に基づく計算。外部ライブラリ不使用・完全オフライン動作。</footer>
+</div>
+
+<script>
+"use strict";
+
+function gid(id) { return document.getElementById(id); }
+function fmt(n) { return Math.round(n).toLocaleString('ja-JP'); }
+function isDark() { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches); }
+function getNum(id) { var v = parseFloat(gid(id).value); return isNaN(v) ? 0 : v; }
+function getStr(id) { return gid(id).value; }
+
+function st(name) {
+  var names = ['inp','sp','adv','res','life'];
+  var tabs = document.querySelectorAll('.tab');
+  var tcs  = document.querySelectorAll('.tc');
+  for (var i = 0; i < names.length; i++) {
+    if (names[i] === name) { tabs[i].classList.add('on'); } else { tabs[i].classList.remove('on'); }
+    if (names[i] === name) { tcs[i].classList.add('on');  } else { tcs[i].classList.remove('on'); }
+  }
+}
+
+var empMsgMap = {
+  company_full: '厚生年金・健康保険に加入。老齢厚生年金を受給できます。',
+  company_part: '週20時間以上かつ月額8.8万円以上（従業員51人以上）で社会保険加入義務があります。',
+  public_full:  '共済組合（2015年10月以降は厚生年金に統合）。退職共済年金は老齢厚生年金として計算されます。',
+  self_full:    '国民年金第1号被保険者。老齢基礎年金のみ。付加年金・国民年金基金・iDeCoで上乗せ可能。',
+  self_freela:  '国民年金第1号被保険者。iDeCoは月6.8万円まで掛金可能。',
+  part_hoken:   '週20時間以上・月額8.8万円以上等の要件を満たせば社会保険加入。老齢厚生年金も受給可能。',
+  part_nashi:   '国民年金第1号被保険者として自分で納付。老齢基礎年金のみ。',
+  fuyou_106:    '配偶者の扶養内（第3号被保険者）。保険料負担なしで老齢基礎年金を取得。年収106万円未満・週20時間未満が目安。',
+  fuyou_130:    '年収106〜130万円未満。勤務先規模によっては社会保険加入義務が発生する場合があります。',
+  fuyou_150:    '年収130〜150万円。原則として自身で国民年金・健康保険に加入が必要。加給年金の対象外。',
+  fuyou_over:   '扶養外。自身で国民年金または厚生年金に加入。配偶者特別控除の段階的縮小に注意。',
+  housewife:    '第3号被保険者。配偶者が厚生年金加入者である間、保険料負担なしで国民年金に加入。老齢基礎年金を受給可能。',
+  student:      '学生納付特例利用中は受給資格期間に算入されるが、年金額には反映されない（追納すれば反映）。',
+  unemployed:   '国民年金第1号被保険者として納付義務あり。低所得の場合は免除・猶予制度を活用可能。',
+  disab_work:   '障害年金受給中は老齢年金との選択（65歳以降は一部併給可）。',
+  mixed:        '厚生年金加入期間と国民年金加入期間がそれぞれ計算されます。',
+  abroad:       '海外居住中は国民年金の任意加入が可能（未加入の場合は受給資格期間に算入されない）。'
+};
+
+var noEmpList = ['self_full','self_freela','part_nashi','fuyou_106','fuyou_130','fuyou_150','housewife','student','unemployed','abroad'];
+var partList  = ['company_part','part_hoken','part_nashi','fuyou_106','fuyou_130','fuyou_150'];
+
+function updEmp() {
+  var v = getStr('empStatus');
+  var noEmp = (noEmpList.indexOf(v) >= 0);
+  gid('fEmpY').style.display = noEmp ? 'none' : 'flex';
+  gid('fMon').style.display  = noEmp ? 'none' : 'flex';
+  gid('gPart').style.display = (partList.indexOf(v) >= 0) ? 'flex' : 'none';
+  var msg = empMsgMap[v] || '';
+  gid('empInfo').textContent = msg;
+  gid('empInfo').style.display = msg ? 'block' : 'none';
+}
+
+var spMsgMap = {
+  hw3:    '配偶者は第3号被保険者として老齢基礎年金を受給。本人に加給年金が加算される場合あり（加入20年以上かつ生計維持）。',
+  pf106:  '年収106万円未満・週20時間未満であれば第3号被保険者。加給年金対象の可能性があります。',
+  pf130:  '年収106〜130万円。勤務先規模によっては社会保険加入義務発生。加給年金要確認。',
+  pf150:  '年収130〜150万円。原則として扶養から外れ、自身で年金・保険料を負担。加給年金の対象外。',
+  phoken: '配偶者自身の厚生年金加入期間に応じた老齢厚生年金を受給。収入が高ければ加給年金対象外。',
+  cfull:  '配偶者も老齢厚生年金を受給。本人の加給年金は配偶者収入等により対象外となる場合が多い。',
+  pgov:   '配偶者も厚生年金（旧共済）加入。加給年金の扱いは共済統合ルールに従う。',
+  self:   '配偶者は第1号被保険者として国民年金を自己負担。老齢基礎年金を受給。',
+  sdisab: '配偶者が障害年金1〜2級受給中は加給年金に特別加算が付く場合があります。',
+  dead:   '配偶者死亡により遺族年金受給中。遺族年金欄で設定してください。'
+};
+
+function updSp() {
+  var v = getStr('spSt');
+  if (v === 'none') { gid('spDetail').classList.add('hid'); } else { gid('spDetail').classList.remove('hid'); }
+  var msg = spMsgMap[v] || '';
+  gid('spInfoBox').textContent = msg;
+  gid('spInfoBox').style.display = msg ? 'block' : 'none';
+}
+
+updEmp(); updSp();
+
+var lastData = null;
+
+function calc() {
+  var startAge = getNum('startAge');
+  var deathAge = getNum('deathAge');
+  var empSt    = getStr('empStatus');
+  var noEmp    = (noEmpList.indexOf(empSt) >= 0);
+  var empY     = noEmp ? 0 : getNum('empYears');
+  var avgMon   = noEmp ? 0 : getNum('avgMonthly');
+  var paidMon  = getNum('paidMon');
+  var menjoMon = getNum('menjoMon');
+  var fuka     = getStr('fuka');
+  var fukaM    = getNum('fukaMon');
+  var npf      = getStr('npf');
+  var npfA     = getNum('npfAmt');
+  var ideco    = getStr('ideco');
+  var idecoA   = getNum('idecoAmt');
+  var idecoY   = getNum('idecoY');
+  var idecoR   = getNum('idecoR') / 100;
+  var dbPen    = getStr('dbPen');
+  var dbA      = getNum('dbAmt');
+  var dcPen    = getStr('dcPen');
+  var dcA      = getNum('dcAmt');
+  var w65      = getStr('w65');
+  var sal65    = getNum('sal65');
+  var spSt     = getStr('spSt');
+  var spBirth  = getNum('spBirth');
+  var spInc    = spSt !== 'none' ? getNum('spInc') : 0;
+  var spEmpY   = spSt !== 'none' ? getNum('spEmpY') : 0;
+  var spMon    = spSt !== 'none' ? getNum('spMon') : 0;
+  var childCnt = getNum('childCnt');
+  var survivors = getStr('survivors');
+  var disabPen  = getStr('disabPen');
+
+  var BASIC = 816000;
+  var effPaid = Math.min(paidMon, 480);
+  var menjoEff = menjoMon * 0.5;
+
+  var basicPen = BASIC * (effPaid + menjoEff * 0.5) / 480;
+  if (fuka === 'yes') { basicPen += fukaM * 200; }
+  if (npf  === 'yes') { basicPen += npfA * 12; }
+
+  var avgMonY = avgMon * 10000;
+  var empPen  = avgMonY * (5.481 / 1000) * (empY * 12);
+
+  var rate = 1.0;
+  if (startAge < 65)      { rate = 1 - (65 - startAge) * 0.06; }
+  else if (startAge > 65) { rate = 1 + (startAge - 65) * 0.084; }
+
+  var adjBasic = basicPen * rate;
+  var adjEmp   = empPen * rate;
+
+  var kakyuu = 0;
+  var spAge = 2025 - spBirth;
+  var spLow    = (spSt === 'hw3' || spSt === 'pf106');
+  var spMidLow = (spSt === 'pf130' && spInc < 850000);
+  if (empY >= 20 && spSt !== 'none' && (spLow || spMidLow) && spAge < 65) {
+    kakyuu = 408100 + 78300 * Math.min(childCnt, 2);
+    if (childCnt >= 3) { kakyuu += 78300 * (childCnt - 2); }
+  }
+
+  var zaishoku = 0;
+  if (w65 === 'yes') {
+    var mp  = (adjBasic + adjEmp) / 12;
+    var tot = mp + sal65 * 10000;
+    if (tot > 500000) { zaishoku = Math.min((tot - 500000) / 2, mp) * 12; }
+  }
+
+  var idecoTotal = 0;
+  if (ideco !== 'no') {
+    if (idecoR === 0) { idecoTotal = idecoA * idecoY * 12; }
+    else { idecoTotal = idecoA * ((Math.pow(1 + idecoR, idecoY) - 1) / idecoR) * (1 + idecoR); }
+  }
+  var rcvY     = Math.max(0, deathAge - startAge);
+  var idecoAnn = rcvY > 0 ? idecoTotal / rcvY : 0;
+  var dcAnn    = dcPen === 'yes' ? (dcA * 10000) / Math.max(1, rcvY) : 0;
+
+  var survivorPen = 0;
+  if (survivors === 'basic') { survivorPen = BASIC + (childCnt > 0 ? 228700 : 0); }
+  else if (survivors === 'kosei') { survivorPen = adjEmp * 0.75; }
+  else if (survivors === 'both')  { survivorPen = BASIC + adjEmp * 0.75 + (childCnt > 0 ? 228700 : 0); }
+
+  var disabAnn = 0;
+  if      (disabPen === 'g1') { disabAnn = BASIC * 1.25 + (childCnt > 0 ? 228700 : 0); }
+  else if (disabPen === 'g2') { disabAnn = BASIC + (childCnt > 0 ? 228700 : 0); }
+  else if (disabPen === 'k1') { disabAnn = empPen * 1.25 + BASIC * 1.25; }
+  else if (disabPen === 'k2') { disabAnn = empPen + BASIC; }
+  else if (disabPen === 'k3') { disabAnn = Math.max(empPen, 596300); }
+
+  var spPen = 0;
+  if (spSt === 'cfull' || spSt === 'pgov' || spSt === 'phoken') {
+    spPen = (spMon * 10000) * (5.481 / 1000) * (spEmpY * 12) + BASIC * (spEmpY * 12 / 480);
+  } else if (spSt === 'hw3' || spSt === 'pf106' || spSt === 'pf130' || spSt === 'self') {
+    spPen = BASIC;
+  }
+
+  var empLabels = {
+    company_full:'会社員（正社員）', company_part:'会社員（パート）', public_full:'公務員',
+    self_full:'自営業', self_freela:'フリーランス', part_hoken:'パート（社保加入）',
+    part_nashi:'パート（社保未加入）', fuyou_106:'扶養内パート（106万円未満）',
+    fuyou_130:'扶養内パート（106〜130万円）', fuyou_150:'扶養内パート（130〜150万円）',
+    fuyou_over:'扶養外・一定収入あり', housewife:'専業主婦・主夫（第3号）',
+    student:'学生', unemployed:'無職', disab_work:'障害・傷病',
+    mixed:'会社員→自営業', abroad:'海外居住'
+  };
+
+  var tBasic = adjBasic;
+  var tEmp   = Math.max(0, adjEmp - zaishoku);
+  var tDB    = dbPen === 'yes' ? dbA * 10000 : 0;
+  var tIdeco = idecoAnn;
+  var tDC    = dcAnn;
+  var tKak   = kakyuu;
+  var tSurv  = survivorPen;
+  var tDisab = disabAnn;
+  var grand  = tBasic + tEmp + tDB + tIdeco + tDC + tKak + tSurv + tDisab;
+
+  lastData = {
+    tBasic:tBasic, tEmp:tEmp, tDB:tDB, tIdeco:tIdeco, tDC:tDC, tKak:tKak, tSurv:tSurv, tDisab:tDisab,
+    grand:grand, monthly:grand/12, rcvY:rcvY, lifetime:grand*rcvY,
+    startAge:startAge, deathAge:deathAge, zaishoku:zaishoku,
+    empY:empY, avgMon:avgMon, rate:rate, idecoTotal:idecoTotal,
+    spPen:spPen, spSt:spSt, empLabel:(empLabels[empSt] || '')
+  };
+
+  renderResult(lastData);
+  setTimeout(function() { renderLifetime(lastData); }, 80);
+}
+
+function ce(tag, cls, txt) {
+  var el = document.createElement(tag);
+  if (cls) { el.className = cls; }
+  if (txt !== undefined && txt !== null) { el.textContent = txt; }
+  return el;
+}
+
+function renderResult(d) {
+  var el = gid('resContent');
+  el.innerHTML = '';
+
+  var rateStr;
+  if (d.rate < 1)      { rateStr = '繰上（' + Math.round((1 - d.rate) * 100) + '%減）'; }
+  else if (d.rate > 1) { rateStr = '繰下（' + Math.round((d.rate - 1) * 100) + '%増）'; }
+  else                 { rateStr = '65歳・基準'; }
+
+  var mg = ce('div', 'mg');
+  function met(label, main, sub) {
+    var m = ce('div', 'met');
+    m.appendChild(ce('div', 'ml', label));
+    m.appendChild(ce('div', 'mv', main));
+    m.appendChild(ce('div', 'ms', sub));
+    return m;
+  }
+  mg.appendChild(met('月額受給額', fmt(Math.round(d.monthly / 10000)) + '万円', fmt(Math.round(d.monthly)) + '円/月'));
+  mg.appendChild(met('年間受給額', fmt(Math.round(d.grand / 10000)) + '万円', fmt(Math.round(d.grand)) + '円/年'));
+  mg.appendChild(met('生涯受給総額', fmt(Math.round(d.lifetime / 10000)) + '万円', d.rcvY + '年間受給'));
+  el.appendChild(mg);
+
+  var blist = ce('div', 'blist');
+  function row(label, val, cls, bdgTxt, bdgCls) {
+    var r = ce('div', 'br' + (cls ? ' ' + cls : ''));
+    var sp = document.createElement('span');
+    sp.textContent = label;
+    if (bdgTxt) {
+      var b = ce('span', 'badge ' + bdgCls, bdgTxt);
+      sp.appendChild(b);
+    }
+    r.appendChild(sp);
+    r.appendChild(ce('span', '', val));
+    blist.appendChild(r);
+  }
+  row('年金の種類・内訳', '年額', 'hd', '', '');
+  row('老齢基礎年金', fmt(Math.round(d.tBasic / 10000)) + '万円', '', '国民年金', 'bs');
+  if (d.tEmp   > 0) { row('老齢厚生年金', fmt(Math.round(d.tEmp / 10000)) + '万円', '', '厚生年金', 'bi'); }
+  if (d.tKak   > 0) { row('加給年金', fmt(Math.round(d.tKak / 10000)) + '万円', '', '配偶者加算', 'bw'); }
+  if (d.tDB    > 0) { row('確定給付企業年金（DB）', fmt(Math.round(d.tDB / 10000)) + '万円', '', '', ''); }
+  if (d.tIdeco > 0) { row('iDeCo（個人型DC）', fmt(Math.round(d.tIdeco / 10000)) + '万円', '', '', ''); }
+  if (d.tDC    > 0) { row('企業型DC', fmt(Math.round(d.tDC / 10000)) + '万円', '', '', ''); }
+  if (d.tSurv  > 0) { row('遺族年金', fmt(Math.round(d.tSurv / 10000)) + '万円', '', '', ''); }
+  if (d.tDisab > 0) { row('障害年金', fmt(Math.round(d.tDisab / 10000)) + '万円', '', '', ''); }
+  if (d.zaishoku > 0) { row('在職老齢年金 支給停止', '-' + fmt(Math.round(d.zaishoku / 10000)) + '万円', 'neg', '', ''); }
+  row('合計（年額）', fmt(Math.round(d.grand / 10000)) + '万円', 'tot', '', '');
+  el.appendChild(blist);
+
+  if (d.spSt !== 'none') {
+    var ib = ce('div', 'ibox', '配偶者の老齢年金（概算）：年額 約' + fmt(Math.round(d.spPen / 10000)) + '万円 / 世帯合計：約' + fmt(Math.round((d.grand + d.spPen) / 10000)) + '万円/年');
+    el.appendChild(ib);
+  }
+
+  var noteText = '就業：' + d.empLabel + ' / ' + rateStr + '（' + d.startAge + '歳開始）/ 厚生年金' + d.empY + '年・標準報酬' + d.avgMon + '万円';
+  if (d.idecoTotal > 0) { noteText += ' / iDeCo運用総額 約' + fmt(Math.round(d.idecoTotal / 10000)) + '万円'; }
+  el.appendChild(ce('div', 'notice', noteText));
+
+  var cw = ce('div', 'cw');
+  var cv = document.createElement('canvas');
+  cv.id = 'cPie'; cv.style.width = '100%';
+  cw.appendChild(cv);
+  el.appendChild(cw);
+  var lg = ce('div', 'leg'); lg.id = 'pieLeg';
+  el.appendChild(lg);
+
+  setTimeout(function() { drawPie(d); }, 20);
+}
+
+var PIE_COLORS = ['#1D9E75','#378ADD','#BA7517','#7F77DD','#D85A30','#D4537E','#888780','#E24B4A'];
+var PIE_LABELS = ['老齢基礎年金','老齢厚生年金','加給年金','確定給付企業年金','iDeCo','企業型DC','遺族年金','障害年金'];
+
+function drawPie(d) {
+  var vals = [d.tBasic, d.tEmp, d.tKak, d.tDB, d.tIdeco, d.tDC, d.tSurv, d.tDisab];
+  var items = [];
+  var total = 0;
+  for (var i = 0; i < vals.length; i++) {
+    if (vals[i] > 0) { items.push({ v: vals[i], label: PIE_LABELS[i], color: PIE_COLORS[i] }); total += vals[i]; }
+  }
+  if (total === 0) { return; }
+
+  var legEl = gid('pieLeg');
+  if (legEl) {
+    legEl.innerHTML = '';
+    for (var m = 0; m < items.length; m++) {
+      var sp = document.createElement('span');
+      var dot = ce('span', 'ldot'); dot.style.background = items[m].color;
+      sp.appendChild(dot);
+      sp.appendChild(document.createTextNode(items[m].label + '（' + fmt(Math.round(items[m].v / 10000)) + '万円）'));
+      legEl.appendChild(sp);
+    }
+  }
+
+  var canvas = gid('cPie');
+  if (!canvas) { return; }
+  var dpr = window.devicePixelRatio || 1;
+  var pw = canvas.parentElement;
+  var W = pw ? pw.offsetWidth : 320;
+  if (W < 20) { W = 320; }
+  var H = 200;
+  canvas.width  = Math.floor(W * dpr);
+  canvas.height = Math.floor(H * dpr);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var cx = W * 0.38, cy = H / 2, r = Math.min(cx, cy) - 12;
+  var ang = -Math.PI / 2;
+  for (var n = 0; n < items.length; n++) {
+    var sl = (items[n].v / total) * 2 * Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, ang, ang + sl);
+    ctx.closePath();
+    ctx.fillStyle = items[n].color; ctx.fill();
+    ctx.strokeStyle = isDark() ? '#1e1e1c' : '#fff';
+    ctx.lineWidth = 2; ctx.stroke();
+    ang += sl;
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.52, 0, 2 * Math.PI);
+  ctx.fillStyle = isDark() ? '#1e1e1c' : '#fff'; ctx.fill();
+
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = isDark() ? '#f0efea' : '#1a1a18';
+  ctx.font = '500 13px -apple-system,sans-serif';
+  ctx.fillText(fmt(Math.round(total / 10000)) + '万円', cx, cy - 7);
+  ctx.font = '11px -apple-system,sans-serif';
+  ctx.fillStyle = isDark() ? '#a8a8a4' : '#6b6b67';
+  ctx.fillText('年間合計', cx, cy + 10);
+}
+
+function renderLifetime(d) {
+  var el = gid('lifeContent');
+  el.innerHTML = '';
+
+  var t1 = ce('div', 'stitle', '年別内訳（万円/年）');
+  t1.style.marginBottom = '8px'; el.appendChild(t1);
+
+  var lg = ce('div', 'leg'); lg.id = 'barLeg';
+  var litems = [
+    { label: '老齢基礎年金', color: '#1D9E75' },
+    { label: '老齢厚生年金', color: '#378ADD' },
+    { label: 'その他（企業年金等）', color: '#7F77DD' }
+  ];
+  for (var li = 0; li < litems.length; li++) {
+    var lsp = document.createElement('span');
+    var ldot = ce('span', 'ldot'); ldot.style.background = litems[li].color;
+    lsp.appendChild(ldot);
+    lsp.appendChild(document.createTextNode(litems[li].label));
+    lg.appendChild(lsp);
+  }
+  el.appendChild(lg);
+
+  var cw1 = ce('div', 'cw');
+  var cb = document.createElement('canvas'); cb.id = 'cBar'; cb.style.width = '100%';
+  cw1.appendChild(cb); el.appendChild(cw1);
+
+  var t2 = ce('div', 'stitle', '累積受給総額（万円）');
+  t2.style.marginBottom = '8px'; el.appendChild(t2);
+
+  var cw2 = ce('div', 'cw');
+  var cl = document.createElement('canvas'); cl.id = 'cLine'; cl.style.width = '100%';
+  cw2.appendChild(cl); el.appendChild(cw2);
+
+  var ages = [], yB = [], yE = [], yO = [], cum = [];
+  var c = 0;
+  for (var age = d.startAge; age <= d.deathAge; age++) {
+    var other = d.tDB + d.tIdeco + d.tDC + d.tKak + d.tSurv + d.tDisab;
+    ages.push(age + '歳');
+    yB.push(Math.round(d.tBasic / 10000));
+    yE.push(Math.round(d.tEmp / 10000));
+    yO.push(Math.round(other / 10000));
+    c += d.tBasic + d.tEmp + other;
+    cum.push(Math.round(c / 10000));
+  }
+
+  setTimeout(function() { drawBar(ages, yB, yE, yO); drawLine(ages, cum); }, 20);
+}
+
+function getCanvasW(id, fallback) {
+  var cv = gid(id);
+  if (!cv) { return fallback; }
+  var pw = cv.parentElement;
+  var w = pw ? pw.offsetWidth : 0;
+  return w > 20 ? w : fallback;
+}
+
+function drawBar(labels, yB, yE, yO) {
+  var canvas = gid('cBar'); if (!canvas) { return; }
+  var dpr = window.devicePixelRatio || 1;
+  var W = getCanvasW('cBar', 320), H = 260;
+  canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  var ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+
+  var dk = isDark();
+  var tc = dk ? '#a8a8a4' : '#6b6b67';
+  var gc = dk ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+  var pad = { t: 10, r: 10, b: 34, l: 44 };
+  var cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
+  var n = labels.length;
+
+  var maxArr = [];
+  for (var i = 0; i < n; i++) { maxArr.push(yB[i] + yE[i] + yO[i]); }
+  var maxVal = (maxArr.length > 0 ? Math.max.apply(null, maxArr) : 0) * 1.1 || 100;
+
+  ctx.font = '10px -apple-system,sans-serif';
+  for (var t = 0; t <= 5; t++) {
+    var v = Math.round((maxVal / 5) * t);
+    var y = pad.t + cH - (cH * (v / maxVal));
+    ctx.beginPath(); ctx.strokeStyle = gc; ctx.lineWidth = 0.5;
+    ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y); ctx.stroke();
+    ctx.fillStyle = tc; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(v + '万', pad.l - 4, y);
+  }
+
+  var barW = Math.max(2, cW / n * 0.7);
+  var gap  = cW / n;
+
+  for (var j = 0; j < n; j++) {
+    var x = pad.l + gap * j + (gap - barW) / 2;
+    var base = 0;
+    var segs = [[yB[j],'#1D9E75'],[yE[j],'#378ADD'],[yO[j],'#7F77DD']];
+    for (var s = 0; s < segs.length; s++) {
+      var sv = segs[s][0], sc = segs[s][1];
+      if (sv > 0) {
+        var sh = (sv / maxVal) * cH;
+        ctx.fillStyle = sc;
+        ctx.fillRect(x, pad.t + cH - base - sh, barW, sh);
+        base += sh;
+      }
+    }
+    var step = Math.max(1, Math.ceil(n / 10));
+    if (j % step === 0 || j === n - 1) {
+      ctx.fillStyle = tc; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(labels[j], x + barW / 2, H - pad.b + 4);
+    }
+  }
+}
+
+function drawLine(labels, data) {
+  var canvas = gid('cLine'); if (!canvas) { return; }
+  var dpr = window.devicePixelRatio || 1;
+  var W = getCanvasW('cLine', 320), H = 190;
+  canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  var ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+
+  var dk = isDark();
+  var tc = dk ? '#a8a8a4' : '#6b6b67';
+  var gc = dk ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+  var lc = '#D85A30';
+  var pad = { t: 10, r: 10, b: 34, l: 52 };
+  var cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
+  var n = data.length;
+  var maxVal = (data.length > 0 ? Math.max.apply(null, data) : 0) * 1.08 || 100;
+
+  ctx.font = '10px -apple-system,sans-serif';
+  for (var t = 0; t <= 4; t++) {
+    var v = Math.round((maxVal / 4) * t);
+    var y = pad.t + cH - (cH * (v / maxVal));
+    ctx.beginPath(); ctx.strokeStyle = gc; ctx.lineWidth = 0.5;
+    ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y); ctx.stroke();
+    ctx.fillStyle = tc; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(v + '万', pad.l - 4, y);
+  }
+
+  function px(i) { return pad.l + (n > 1 ? (cW / (n - 1)) * i : cW / 2); }
+  function py(val) { return pad.t + cH - (cH * (val / maxVal)); }
+
+  if (n === 0) { return; }
+
+  ctx.beginPath(); ctx.moveTo(px(0), py(data[0]));
+  for (var i = 1; i < n; i++) { ctx.lineTo(px(i), py(data[i])); }
+  ctx.lineTo(px(n - 1), pad.t + cH);
+  ctx.lineTo(px(0), pad.t + cH);
+  ctx.closePath();
+  ctx.fillStyle = dk ? 'rgba(216,90,48,0.15)' : 'rgba(216,90,48,0.1)'; ctx.fill();
+
+  ctx.beginPath(); ctx.strokeStyle = lc; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+  ctx.moveTo(px(0), py(data[0]));
+  for (var j = 1; j < n; j++) { ctx.lineTo(px(j), py(data[j])); }
+  ctx.stroke();
+
+  var step = Math.max(1, Math.ceil(n / 10));
+  for (var k = 0; k < n; k++) {
+    if (k % step === 0 || k === n - 1) {
+      ctx.beginPath(); ctx.arc(px(k), py(data[k]), 3, 0, 2 * Math.PI);
+      ctx.fillStyle = lc; ctx.fill();
+      ctx.fillStyle = tc; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(labels[k], px(k), H - pad.b + 4);
+    }
+  }
+}
+
+var rsz;
+window.addEventListener('resize', function() {
+  clearTimeout(rsz);
+  rsz = setTimeout(function() {
+    if (!lastData) { return; }
+    drawPie(lastData);
+    if (gid('cBar') && gid('cLine')) {
+      var ages = [], yB = [], yE = [], yO = [], cum = [];
+      var c = 0;
+      for (var age = lastData.startAge; age <= lastData.deathAge; age++) {
+        var ot = lastData.tDB + lastData.tIdeco + lastData.tDC + lastData.tKak + lastData.tSurv + lastData.tDisab;
+        ages.push(age + '歳');
+        yB.push(Math.round(lastData.tBasic / 10000));
+        yE.push(Math.round(lastData.tEmp   / 10000));
+        yO.push(Math.round(ot              / 10000));
+        c += lastData.tBasic + lastData.tEmp + ot;
+        cum.push(Math.round(c / 10000));
+      }
+      drawBar(ages, yB, yE, yO);
+      drawLine(ages, cum);
+    }
+  }, 200);
+});
+</script>
+</body>
+</html>
